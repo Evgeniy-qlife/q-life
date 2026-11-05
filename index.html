@@ -3,232 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Q-Life | Квантовое Зеркало</title>
+    <title>Q-Life | ИИ + Квантовые Алгоритмы</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #0f0f13; color: #eee; margin: 0; padding: 15px; }
         .container { max-width: 700px; margin: auto; }
         h2 { color: #00FFAA; text-align: center; margin-bottom: 5px; }
-        p.subtitle { text-align: center; color: #888; font-size: 14px; margin-bottom: 20px; }
-        select { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #333; background: #1e1e24; color: #fff; font-size: 16px; }
-        button { width: 100%; padding: 15px; background: #00FFAA; color: #000; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #00cc88; }
-        button:disabled { background: #444; color: #888; cursor: not-allowed; }
-        .chat-box { height: 300px; overflow-y: auto; border: 1px solid #2a2a35; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: #16161c; display: none; }
+        .settings { background: #1e1e24; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 12px;}
+        select, input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #333; background: #1e1e24; color: #fff; font-size: 14px; box-sizing: border-box;}
+        button { width: 100%; padding: 15px; background: #00FFAA; color: #000; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        button:disabled { background: #444; color: #888; }
+        .chat-box { height: 350px; overflow-y: auto; border: 1px solid #2a2a35; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: #16161c; display: none; }
         .message { margin-bottom: 12px; padding: 12px; border-radius: 8px; font-size: 14px; line-height: 1.4; animation: fadeIn 0.4s ease-in-out; }
-        .user { background: #1e3a5f; text-align: right; margin-left: 20%; border-bottom-right-radius: 0; }
-        .ai { background: #1e4620; text-align: left; margin-right: 20%; border-bottom-left-radius: 0; }
+        .user { background: #1e3a5f; text-align: right; margin-left: 20%; }
+        .ai { background: #1e4620; text-align: left; margin-right: 20%; }
         .system { background: #4a1e5f; text-align: center; font-weight: bold; color: #d8b4fe; font-size: 12px; }
+        .input-area { display: none; gap: 10px; margin-bottom: 15px; }
         #result-area { display: none; animation: fadeIn 0.8s ease-in-out; }
         .chart-wrapper { background: #16161c; padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #2a2a35; }
         .analysis-box { background: #1a1a24; padding: 25px; border-radius: 8px; border-left: 4px solid #00FFAA; }
         .analysis-box h3 { margin-top: 0; color: #00FFAA; }
-        .analysis-box .empathy { font-style: italic; color: #bbb; margin-bottom: 20px; line-height: 1.6; font-size: 15px; }
-        .analysis-box .quantum-insight { color: #FFD700; font-weight: bold; margin-bottom: 20px; font-size: 16px; }
+        .empathy { font-style: italic; color: #bbb; margin-bottom: 20px; line-height: 1.6; }
+        .quantum-insight { color: #FFD700; font-weight: bold; margin-bottom: 20px; }
         .analysis-box ul { padding-left: 20px; font-size: 14px; line-height: 1.6; }
         .analysis-box li { margin-bottom: 12px; }
-        .analysis-box .highlight { color: #00FFAA; font-weight: bold; }
+        .highlight { color: #00FFAA; font-weight: bold; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>🌌 Q-Life</h2>
-        <p class="subtitle">Квантовый анализ вашего жизненного пути</p>
         
+        <div class="settings">
+            <label>OpenAI API Key (хранится только в вашем браузере):</label>
+            <input type="password" id="apiKey" placeholder="sk-...">
+        </div>
+
         <select id="algo-select">
-            <option value="qaoa">⚖️ QAOA (Баланс ресурсов и выгорание)</option>
-            <option value="grover">🔍 Гровер (Поиск истинного призвания)</option>
-            <option value="annealing">⛏️ Отжиг (Выход из жизненного тупика)</option>
-            <option value="vqe">🧘 VQE (Освобождение от тревоги)</option>
+            <option value="qaoa">⚖️ QAOA (Баланс ресурсов)</option>
+            <option value="grover">🔍 Гровер (Поиск призвания)</option>
+            <option value="annealing">⛏️ Отжиг (Выход из тупика)</option>
+            <option value="vqe">🧘 VQE (Внутренний покой)</option>
+            <option value="qec">🛡️ QEC (Защита от стресса)</option>
         </select>
         
-        <button id="start-btn" onclick="startSimulation()">🚀 Запустить симуляцию</button>
+        <button id="start-btn" onclick="startSession()">🚀 Начать ИИ-сессию</button>
         
         <div class="chat-box" id="chat-box"></div>
+        <div class="input-area" id="input-area">
+            <input type="text" id="user-input" placeholder="Ваш ответ..." onkeypress="handleEnter(event)">
+            <button onclick="sendMessage()" style="width: 30%;">➤</button>
+        </div>
 
         <div id="result-area">
-            <div class="chart-wrapper">
-                <canvas id="quantumChart"></canvas>
-            </div>
+            <div class="chart-wrapper"><canvas id="quantumChart"></canvas></div>
             <div class="analysis-box" id="analysis-text"></div>
         </div>
     </div>
 
     <script>
-        const scenarios = {
-            qaoa: {
-                dialogue: [
-                    { role: 'ai', text: 'Привет. Я вижу, что вы много работаете. Как ваше состояние?' },
-                    { role: 'user', text: 'Я выгораю. Работаю на износ, чтобы платить ипотеку, но сил больше нет.' },
-                    { role: 'ai', text: 'Я слышу вашу усталость. Чего вы боитесь больше всего, если позволите себе отдых?' },
-                    { role: 'user', text: 'Что упадет доход и я не смогу закрыть кредит. Страх бедности сильнее усталости.' },
-                    { role: 'system', text: '📡 Данные собраны. Квантовый алгоритм QAOA ищет выход...' }
-                ],
-                chartType: 'bar',
-                chartLabels: ["Только Работа", "Учеба", "Работа + Отдых"],
-                chartData: [15, 40, 85],
-                chartColors: ['#ff4d4d', '#FFC107', '#00FFAA'],
-                title: 'Вероятность устойчивости системы',
-                analysis: `
-                    <h3>⚖️ Ваш путь к балансу (QAOA)</h3>
-                    <div class="empathy">
-                        «Я слышу, как сильно вы устали. Вы несете на себе тяжелый груз ответственности, и ваш страх за будущее абсолютно оправдан. Вы не машина, и ваша усталость — это не слабость, а сигнал тела о помощи.»
-                    </div>
-                    <div class="quantum-insight">
-                        💡 Квантовый инсайт: Вселенная не требует от вас героизма 24/7. Система работает стабильно только в балансе.
-                    </div>
-                    <ul>
-                        <li><b class="highlight">Ваш золотой путь (85%) — Работа + Отдых:</b> Алгоритм показывает, что ваш страх бедности (15%) — это иллюзия. Работая на износ, вы скоро упадете, и тогда доход упадет по-настоящему. Ваш отдых — это <b>страховка вашего дохода</b>.</li>
-                        <li><b>Маленький шаг:</b> Завтра попробуйте закончить работу на 30 минут раньше. Не для того, чтобы сделать больше дел, а чтобы просто выдохнуть.</li>
-                    </ul>
-                `
-            },
-            grover: {
-                dialogue: [
-                    { role: 'ai', text: 'Что вас беспокоит в текущей жизни?' },
-                    { role: 'user', text: 'Я чувствую, что занимаюсь не своим делом. Как будто я живу чужую жизнь.' },
-                    { role: 'ai', text: 'Это тяжелое чувство. А что откликается вам, когда вы представляете «свою» жизнь?' },
-                    { role: 'user', text: 'Творчество. Но я боюсь, что это никому не нужно и я останусь без денег.' },
-                    { role: 'system', text: '📡 Запуск алгоритма Гровера. Отсечение внешнего шума...' }
-                ],
-                chartType: 'bar',
-                chartLabels: ["Шум", "Безопасность", "Творчество"],
-                chartData: [5, 25, 90],
-                chartColors: ['#ff4d4d', '#FFC107', '#00FFAA'],
-                title: 'Усиление истинных желаний',
-                analysis: `
-                    <h3>🔍 Ваше истинное призвание (Гровер)</h3>
-                    <div class="empathy">
-                        «Очень больно осознавать, что годы уходят на нелюбимое дело. Вы имеете полное право хотеть большего, чем просто выживание. Ваш страх, что творчество не принесет денег — это голос ожиданий общества.»
-                    </div>
-                    <div class="quantum-insight">
-                        💡 Квантовый инсайт: Квантовый поиск отсеял 95% «шума». Ваша истинная природа — созидание.
-                    </div>
-                    <ul>
-                        <li><b class="highlight">Ваш золотой путь (90%) — Творчество:</b> Алгоритм показывает, что ваша энергия течет туда, где вы творите.</li>
-                        <li><b>Маленький шаг:</b> Вам не нужно увольняться завтра. Начните выделять 20 минут в день на творчество. Сначала для себя, чтобы вернуть связь с собой.</li>
-                    </ul>
-                `
-            },
-            annealing: {
-                dialogue: [
-                    { role: 'ai', text: 'Как вы себя чувствуете в текущей ситуации?' },
-                    { role: 'user', text: 'Я застрял. Работа стабильная, но я ненавижу туда ходить. Как в клетке.' },
-                    { role: 'ai', text: 'Понимаю вас. А что вас держит в этой клетке?' },
-                    { role: 'user', text: 'Страх. А вдруг на новом месте будет еще хуже? Привычка и зона комфорта.' },
-                    { role: 'system', text: '📡 Запуск Quantum Annealing. Поиск туннеля сквозь страх...' }
-                ],
-                chartType: 'line',
-                chartLabels: ["Текущая зона", "Стена страха", "Новая жизнь"],
-                chartData: [15, 100, 20],
-                chartColors: ['#ff4d4d'],
-                title: 'Энергетический ландшафт жизни',
-                analysis: `
-                    <h3>⛏️ Ваш квантовый туннель (Annealing)</h3>
-                    <div class="empathy">
-                        «То, что вы застряли — это не ваша вина. Человеческий мозг устроен так, чтобы защищать нас от рисков. Ваша «зона комфорта» — это на самом деле зона выживания.»
-                    </div>
-                    <div class="quantum-insight">
-                        💡 Квантовый инсайт: В квантовой физике частица может пройти сквозь стену (туннелирование). Вам не нужно ломать свою жизнь.
-                    </div>
-                    <ul>
-                        <li><b>Стена страха:</b> Она кажется непреодолимой, но это иллюзия вашего ума.</li>
-                        <li><b class="highlight">Маленький шаг:</b> Не увольняйтесь сейчас. Начните строить «квантовый туннель» — маленькое дело на стороне. Когда появится «подушка», стена страха станет ниже.</li>
-                    </ul>
-                `
-            },
-            vqe: {
-                dialogue: [
-                    { role: 'ai', text: 'Что отнимает у вас больше всего сил в последнее время?' },
-                    { role: 'user', text: 'Постоянная тревога. Мой мозг никогда не выключается.' },
-                    { role: 'ai', text: 'Это очень изматывает. На что направлена эта тревога?' },
-                    { role: 'user', text: 'Я пытаюсь всё контролировать: работу, близких. И это меня истощает.' },
-                    { role: 'system', text: '📡 Запуск алгоритма VQE. Поиск основного (спокойного) состояния...' }
-                ],
-                chartType: 'bar',
-                chartLabels: ["Тревога", "Контроль", "Принятие (Покой)"],
-                chartData: [90, 85, 5],
-                chartColors: ['#ff4d4d', '#ff4d4d', '#00FFAA'],
-                title: 'Уровни вашей энергии',
-                analysis: `
-                    <h3>🧘 Ваше основное состояние (VQE)</h3>
-                    <div class="empathy">
-                        «Я вижу, как ваш ум пытается удержать весь мир на своих плечах. Вы живете в постоянном напряжении, думая, что если вы отпустите контроль, всё рухнет. Вы заслуживаете покоя.»
-                    </div>
-                    <div class="quantum-insight">
-                        💡 Квантовый инсайт: В квантовой химии система стремится к «основному состоянию» — точке с минимальной энергией.
-                    </div>
-                    <ul>
-                        <li><b class="highlight">Ваша проблема:</b> Вы застряли в «возбужденном состоянии» (тревога 90%). Вы тратите энергию на борьбу с реальностью.</li>
-                        <li><b>Маленький шаг:</b> Позвольте себе «отпустить поводья». Сделайте 5 глубоких вдохов. Вернитесь в «здесь и сейчас».</li>
-                    </ul>
-                `
-            }
+        const systemPrompts = {
+            qaoa: "Ты — ИИ-коуч по оптимизации (QAOA). Задай 3 вопроса о балансе работы и отдыха. В конце выдай СТРОГО JSON: [РЕЗУЛЬТАТ: {\"energy\": 50, \"capital\": 50, \"knowledge\": 50, \"insight\": \"вывод\", \"empathy\": \"слова поддержки\", \"step\": \"маленький шаг\"}]",
+            grover: "Ты — ИИ-коуч по призванию (Гровер). Задай 3 вопроса о смысле и страхах. В конце выдай СТРОГО JSON: [РЕЗУЛЬТАТ: {\"energy\": 50, \"capital\": 50, \"knowledge\": 50, \"insight\": \"вывод\", \"empathy\": \"слова поддержки\", \"step\": \"маленький шаг\"}]",
+            annealing: "Ты — ИИ-коуч по туннелированию. Задай 3 вопроса о том, где человек застрял. В конце выдай СТРОГО JSON: [РЕЗУЛЬТАТ: {\"energy\": 50, \"capital\": 50, \"knowledge\": 50, \"insight\": \"вывод\", \"empathy\": \"слова поддержки\", \"step\": \"маленький шаг\"}]",
+            vqe: "Ты — ИИ-коуч по покою (VQE). Задай 3 вопроса о тревоге. В конце выдай СТРОГО JSON: [РЕЗУЛЬТАТ: {\"energy\": 50, \"capital\": 50, \"knowledge\": 50, \"insight\": \"вывод\", \"empathy\": \"слова поддержки\", \"step\": \"маленький шаг\"}]",
+            qec: "Ты — ИИ-коуч по квантовой коррекции ошибок (QEC). Задай 3 вопроса о том, что или кто высасывает из человека энергию (токсичное окружение, шум, хаос). В конце выдай СТРОГО JSON: [РЕЗУЛЬТАТ: {\"energy\": 30, \"capital\": 40, \"knowledge\": 50, \"insight\": \"вывод\", \"empathy\": \"слова поддержки\", \"step\": \"маленький шаг\"}]"
         };
 
+        let messages = [];
+        let currentAlgo = 'qaoa';
         let myChart = null;
-        function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
-        async function startSimulation() {
-            const algo = document.getElementById('algo-select').value;
-            const data = scenarios[algo];
+        function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
+
+        async function startSession() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey.startsWith('sk-')) return alert("Пожалуйста, вставьте ваш OpenAI API Key (начинается на sk-)");
+            
+            currentAlgo = document.getElementById('algo-select').value;
             const chatBox = document.getElementById('chat-box');
+            const inputArea = document.getElementById('input-area');
             const btn = document.getElementById('start-btn');
             const resultArea = document.getElementById('result-area');
 
-            btn.disabled = true;
-            btn.innerText = "Идет сессия...";
-            chatBox.style.display = 'block';
-            chatBox.innerHTML = '';
-            resultArea.style.display = 'none';
-            if (myChart) { myChart.destroy(); }
+            btn.disabled = true; btn.innerText = "ИИ анализирует...";
+            chatBox.style.display = 'block'; chatBox.innerHTML = '';
+            inputArea.style.display = 'flex'; resultArea.style.display = 'none';
+            if (myChart) myChart.destroy();
 
-            for (let i = 0; i < data.dialogue.length; i++) {
-                const msg = data.dialogue[i];
-                const div = document.createElement('div');
-                div.className = `message ${msg.role}`;
-                div.innerText = msg.text;
-                chatBox.appendChild(div);
-                chatBox.scrollTop = chatBox.scrollHeight;
-                await sleep(1800);
+            messages = [{ role: 'system', content: systemPrompts[currentAlgo] }];
+            
+            // Первый вопрос от ИИ
+            await callAI("Привет. Я готов помочь. Начнем с простого: что вас сейчас беспокоит больше всего?");
+        }
+
+        async function callAI(userText) {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const chatBox = document.getElementById('chat-box');
+            
+            if (userText) {
+                addMessage('user', userText);
+                messages.push({ role: 'user', content: userText });
             }
 
-            resultArea.style.display = 'block';
-            document.getElementById('analysis-text').innerHTML = data.analysis;
-            
-            const ctx = document.getElementById('quantumChart').getContext('2d');
-            let chartConfig = {
-                type: data.chartType,
-                data: {
-                    labels: data.chartLabels,
-                    datasets: [{
-                        label: data.title,
-                        data: data.chartData,
-                        backgroundColor: data.chartColors,
-                        borderColor: '#fff',
-                        borderWidth: data.chartType === 'bar' ? 1 : 3,
-                        borderRadius: 5,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { 
-                        legend: { display: false },
-                        title: { display: true, text: data.title, color: '#fff', font: {size: 14} }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { color: '#fff' }, grid: { color: '#333' } },
-                        x: { ticks: { color: '#fff' }, grid: { display: false } }
-                    },
-                    animation: { duration: 2000, easing: 'easeOutBounce' }
+            addMessage('system', 'ИИ печатает...');
+
+            try {
+                const res = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                    body: JSON.stringify({ model: 'gpt-4o-mini', messages: messages, temperature: 0.7 })
+                });
+                const data = await res.json();
+                
+                // Удаляем плашку "ИИ печатает..."
+                chatBox.removeChild(chatBox.lastChild);
+
+                if (data.error) {
+                    addMessage('system', 'Ошибка API: ' + data.error.message);
+                    return;
                 }
-            };
-            myChart = new Chart(ctx, chartConfig);
-            btn.innerText = "✅ Сессия завершена. Начать заново";
-            btn.disabled = false;
-            btn.onclick = () => { location.reload(); };
+
+                let reply = data.choices[0].message.content;
+                
+                if (reply.includes('[РЕЗУЛЬТАТ:')) {
+                    let jsonStr = reply.split('[РЕЗУЛЬТАТ:')[1].split(']')[0].trim();
+                    jsonStr = jsonStr.replace(/```json/g, '').replace(/```/g, '');
+                    const finalData = JSON.parse(jsonStr);
+                    const cleanReply = reply.split('[РЕЗУЛЬТАТ:')[0].trim();
+                    
+                    addMessage('ai', cleanReply);
+                    document.getElementById('input-area').style.display = 'none';
+                    showResult(finalData);
+                } else {
+                    addMessage('ai', reply);
+                    messages.push({ role: 'assistant', content: reply });
+                }
+            } catch (e) {
+                addMessage('system', 'Ошибка сети. Проверьте интернет.');
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const text = input.value.trim();
+            if (!text) return;
+            input.value = '';
+            await callAI(text);
+        }
+
+        function addMessage(role, text) {
+            const box = document.getElementById('chat-box');
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            div.innerText = text;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function showResult(data) {
+            document.getElementById('result-area').style.display = 'block';
+            document.getElementById('analysis-text').innerHTML = `
+                <h3>Результат анализа (${currentAlgo.toUpperCase()})</h3>
+                <div class="empathy">«${data.empathy}»</div>
+                <div class="quantum-insight">💡 Квантовый инсайт: ${data.insight}</div>
+                <ul>
+                    <li><b class="highlight">Ваш следующий шаг:</b> ${data.step}</li>
+                </ul>
+            `;
+
+            const ctx = document.getElementById('quantumChart').getContext('2d');
+            let chartData = [data.energy, data.capital, data.knowledge];
+            let labels = ["Энергия", "Капитал", "Знания"];
+            let colors = ['#ff4d4d', '#00FFAA', '#00BFFF'];
+
+            if (currentAlgo === 'qec') {
+                labels = ["Стресс", "Шум", "Устойчивость"];
+                chartData = [100 - data.energy, 100 - data.capital, data.knowledge];
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: labels, datasets: [{ label: 'Уровень', data: chartData, backgroundColor: colors }] },
+                options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100, ticks: { color: '#fff' } }, x: { ticks: { color: '#fff' } } } }
+            });
         }
     </script>
 </body>
