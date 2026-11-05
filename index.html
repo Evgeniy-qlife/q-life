@@ -111,14 +111,14 @@
             try {
                 // ВНИМАНИЕ: Здесь мы поменяли URL на Cloud.ru и модель на DeepSeek-V4-Pro
                 // Если в документации Cloud.ru другой URL, замени его здесь:
-                const res = await fetch('https://api.cloud.ru/v1/chat/completions', {
+                const res = await fetch('https://foundation-models.api.cloud.ru/v1/chat/completions', {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json', 
                         'Authorization': `Bearer ${apiKey}` 
                     },
                     body: JSON.stringify({ 
-                        model: 'deepseek-v4-pro', // Модель, которую ты выбрал
+                        model: 'deepseek-ai/DeepSeek-V4-Pro', // Модель, которую ты выбрал
                         messages: messages, 
                         temperature: 0.7 
                     })
