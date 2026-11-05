@@ -8,9 +8,8 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #0f0f13; color: #eee; margin: 0; padding: 15px; }
         .container { max-width: 700px; margin: auto; }
-        h2 { color: #00FFAA; text-align: center; margin-bottom: 5px; }
-        .settings { background: #1e1e24; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 12px;}
-        select, input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #333; background: #1e1e24; color: #fff; font-size: 14px; box-sizing: border-box;}
+        h2 { color: #00FFAA; text-align: center; margin-bottom: 15px; }
+        select { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #333; background: #1e1e24; color: #fff; font-size: 14px; box-sizing: border-box;}
         button { width: 100%; padding: 15px; background: #00FFAA; color: #000; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
         button:disabled { background: #444; color: #888; }
         .chat-box { height: 350px; overflow-y: auto; border: 1px solid #2a2a35; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: #16161c; display: none; }
@@ -34,11 +33,6 @@
 <body>
     <div class="container">
         <h2>🌌 Q-Life</h2>
-        
-        <div class="settings">
-            <label>API Key (Cloud.ru):</label>
-            <input type="password" id="apiKey" placeholder="Ваш ключ...">
-        </div>
 
         <select id="algo-select">
             <option value="qaoa">⚖️ QAOA (Баланс ресурсов)</option>
@@ -78,9 +72,6 @@
         function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
 
         async function startSession() {
-            const apiKey = document.getElementById('apiKey').value.trim();
-            if (!apiKey) return alert("Пожалуйста, вставьте ваш API-ключ");
-            
             currentAlgo = document.getElementById('algo-select').value;
             const chatBox = document.getElementById('chat-box');
             const inputArea = document.getElementById('input-area');
@@ -98,7 +89,6 @@
         }
 
         async function callAI(userText) {
-            const apiKey = document.getElementById('apiKey').value.trim();
             const chatBox = document.getElementById('chat-box');
             
             if (userText) {
@@ -112,8 +102,7 @@
                 const res = await fetch('http://127.0.0.1:8080', {
                     method: 'POST',
                     headers: { 
-                        'Content-Type': 'application/json', 
-                        'Authorization': `Bearer ${apiKey}` 
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ 
                         model: 'deepseek-ai/DeepSeek-V4-Pro', 
